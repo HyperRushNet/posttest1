@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/api/post", "dest": "/api/post.js" }
+  ]
+}
