@@ -10,7 +10,7 @@ function filterMessage(message) {
 
     forbiddenWords.forEach(word => {
         const regex = new RegExp(word, 'gi');
-        message = message.replace(regex, (match) => match.split('').join('+'));
+        message = message.replace(regex, (match) => match.split('').join('.'));
     });
     return message;
 }
