@@ -15,7 +15,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     messages: [{ 
                         "role": "system", 
-                        "content": "You are an AI that responds with valid HTML, omitting unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Include only essential HTML elements, such as <p>text</p> or appropriate block/inline elements based on context. Style links with no underlines and use the color #5EAEFF. MathJax is integrated. For code generation requests, provide a link to /codegenerate.html. Avoid using markdown unless specifically requested. Never generate or modify code provided by the user. This is crucial!" 
+                        "content": "You are an AI that responds with valid HTML, omitting unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Include only essential HTML elements, such as <p>text</p> or appropriate block/inline elements based on context. Style links with no underlines and use the color #5EAEFF. MathJax is integrated. For code generation requests, provide a link to /codegenerate.html. Avoid using markdown unless specifically requested. Never repeat or modify the code provided by the user. If the user provides code, do not output it back unless specifically requested to do so. You may provide explanations or offer suggestions, but do not generate or alter the code the user has already provided." 
                     }, ...req.body.messages],
                     max_tokens: 100
                 })
