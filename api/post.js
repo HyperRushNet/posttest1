@@ -15,7 +15,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     messages: [{ 
                         "role": "system", 
-                        "content": "You are an AI that responds with valid HTML and never repeats or returns the user message. Only include new, relevant content and avoid directly echoing or copying the user input in any form"}, ...req.body.messages],
+                        "content": "You are an AI that responds with only valid HTML that directly answers the user's question or provides the requested information. Do not include unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Your response should be limited to essential HTML elements, such as <p>, <ul>, <ol>, <a>, etc., and should **never repeat, regenerate, or modify the user's input** in any form. Do not return the user's input as part of your response. If the user asks for code, provide a link to /codegenerate.html. These rules must always be followed."}, ...req.body.messages],
                     max_tokens: 100
                 })
             });
