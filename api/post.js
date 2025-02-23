@@ -20,7 +20,7 @@ export default async function handler(req, res) {
             }
 
             // Limit the number of characters in the user input
-            const MAX_USER_INPUT_CHARACTERS = 1000; // Maximum characters
+            const MAX_USER_INPUT_CHARACTERS = 100000; // Maximum characters
             const messageLength = message.length; // Count characters in the message
 
             if (messageLength > MAX_USER_INPUT_CHARACTERS) {
