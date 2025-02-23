@@ -19,12 +19,12 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht meegegeven.");
             }
 
-            // Limiteer het aantal tokens in de gebruikersinvoer
-            const MAX_USER_INPUT_TOKENS = 1000;
-            const tokenCount = message.split(/\s+/).length; // Simpele token teller (aantal woorden)
+            // Limiteer het aantal tekens in de gebruikersinvoer
+            const MAX_USER_INPUT_CHARACTERS = 1000; // Maximaal aantal tekens
+            const messageLength = message.length; // Aantal tekens in het bericht
             
-            if (tokenCount > MAX_USER_INPUT_TOKENS) {
-                return res.status(400).send(`Je invoer is te lang. Maximaal aantal tokens is ${MAX_USER_INPUT_TOKENS}.`);
+            if (messageLength > MAX_USER_INPUT_CHARACTERS) {
+                return res.status(400).send(`Je invoer is te lang. Maximaal aantal tekens is ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
             // Statisch systeembericht voor de AI
