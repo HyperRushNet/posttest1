@@ -1,3 +1,20 @@
+// Functie om ongewenste woorden te filteren en te vervangen door + tussen de karakters
+function filterMessage(message) {
+    const forbiddenWords = [
+        "porn", "sex", "fuck", "bitch", "asshole", "cunt", "bastard", "whore",
+        "slut", "cock", "dick", "pussy", "fag", "queer", "retard", "nigger","nigga", "spic", "chink",
+        "gypsy", "tranny", "motherfucker", "ass", "bitchass", "twat", "douche", "prick", "cum",
+        "tits", "balls", "genitals", "vagina", "penis", "dildo", "vibrator", "nude", "boobs",
+        "hardcore", "fetish", "rape", "bestiality", "incest", "pedophile", "zoophile"
+    ];
+
+    forbiddenWords.forEach(word => {
+        const regex = new RegExp(word, 'gi');
+        message = message.replace(regex, (match) => match.split('').join('+'));
+    });
+    return message;
+}
+
 export default async function handler(req, res) {
     // CORS settings
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -13,11 +30,14 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
         try {
             // Get the message from the request body
-            const { message } = req.body;
+            let { message } = req.body;
 
             if (!message || message.length === 0) {
                 return res.status(400).send("No message provided.");
             }
+
+            // Filter the message to replace forbidden words
+            message = filterMessage(message);
 
             // Limit the number of characters in the user input
             const MAX_USER_INPUT_CHARACTERS = 100000; // Maximum characters
@@ -35,7 +55,7 @@ export default async function handler(req, res) {
                 },
                 { 
                     "role": "user", 
-                    "content": message // The user's message
+                    "content": message // The user's filtered message
                 }
             ];
 
