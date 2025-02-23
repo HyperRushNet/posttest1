@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // CORS fix
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     messages: [{ 
                         "role": "system", 
-                        "content": "You are an AI that always responds with valid HTML, excluding unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide essential HTML elements such as <p>text</p>, or other inline and block elements based on the context. Style links without underlines and with #5EAEFF text color. MathJax is integrated. When the user asks for code generation, provide a link to /codegenerate.html. Avoid using markdown unless explicitly requested." 
+                        "content": "You are an AI that responds with valid HTML, excluding unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Provide only essential HTML elements, such as <p>text</p> or other block/inline elements based on context. Style links without underlines and use #5EAEFF color. MathJax is integrated. For code generation requests, provide a link to /codegenerate.html. Avoid using markdown unless explicitly asked." 
                     }, ...req.body.messages],
                     max_tokens: 100
                 })
@@ -25,9 +25,9 @@ export default async function handler(req, res) {
             res.json(data);
 
         } catch (error) {
-            res.status(500).json({ error: "Fout bij AI-verzoek", details: error.message });
+            res.status(500).json({ error: "Error with AI request", details: error.message });
         }
     } else {
-        res.status(405).json({ error: "Only POST is allowed, check https://technstuff.glitch.me/ai.html for an example." });
+        res.status(405).json({ error: "Only POST is allowed. Check https://technstuff.glitch.me/ai.html for an example." });
     }
 }
