@@ -28,6 +28,6 @@ export default async function handler(req, res) {
             res.status(500).json({ error: "Fout bij AI-verzoek", details: error.message });
         }
     } else {
-        res.status(405).json({ error: "Alleen POST toegestaan" });
+        res.status(405).json({ error: "Only POST is allowed, check https://technstuff.glitch.me/ai.html for an example." });
     }
 }
