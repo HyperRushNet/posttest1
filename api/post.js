@@ -30,16 +30,18 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Fetch current time for Europe/Brussels using TimeZoneDB API
-            const timezoneResponse = await fetch('http://worldtimeapi.org/api/timezone/Europe/Brussels');
+            // Fetch timezone information from ipapi.co
+            const timezoneResponse = await fetch('https://ipapi.co/json/');
             const timezoneData = await timezoneResponse.json();
 
-            // Extract date and time information
-            const currentDateTime = timezoneData.datetime; // ISO 8601 format
+            // Extract timezone from ipapi response
             const timezone = timezoneData.timezone;
 
-            // Format the datetime to include the full date and time
+            // Extract date and time information (assuming datetime is provided in ipapi response)
+            const currentDateTime = timezoneData.datetime; // If ipapi doesn't provide datetime, you may need another source
             const now = new Date(currentDateTime);
+
+            // Format the datetime to include the full date and time
             const formattedTime = now.toLocaleString('en-US', {
                 weekday: 'long',
                 month: 'long',
