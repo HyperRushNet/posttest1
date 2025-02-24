@@ -30,12 +30,8 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Fetch timezone information from ipapi.co
-            const timezoneResponse = await fetch('https://ipapi.co/json/');
-            const timezoneData = await timezoneResponse.json();
-
-            // Extract timezone from ipapi response
-            const timezone = timezoneData.timezone;
+            // Force the timezone to always be Europe/Brussels
+            const timezone = "Europe/Brussels";
 
             // Get the current date and time using JavaScript's Date object (Browser time)
             const now = new Date();
