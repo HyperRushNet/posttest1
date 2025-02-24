@@ -1,9 +1,3 @@
-// Functie om ongewenste woorden te filteren en te vervangen door + tussen de karakters
-function filterMessage(message) {
-    message = message.replace(/[^a-zA-Z0-9 ]/g, ''); // Alleen letters en cijfers behouden
-    return message;
-}
-
 export default async function handler(req, res) {
     // CORS settings
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,7 +20,7 @@ export default async function handler(req, res) {
             }
 
             // Filter the message to replace forbidden words
-            message = filterMessage(message);
+            message = message.replace(/[^a-zA-Z0-9 ]/g, ''); // Filter unwanted characters
 
             // Limit the number of characters in the user input
             const MAX_USER_INPUT_CHARACTERS = 100000; // Maximum characters
@@ -36,22 +30,26 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Get current date and time (system time)
+            // Fetch the user's IP location and timezone from ipapi.co
+            const ipResponse = await fetch('https://ipapi.co/json/');
+            const ipData = await ipResponse.json();
+
+            // Extract the timezone from the response
+            const userTimezone = ipData.timezone;
+
+            // Get the current time based on the user's timezone
             const now = new Date();
-
-            // Verkrijg het uur, minuten en seconden van de lokale servertijd
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            // Verkrijg de dag van de week, maand, dag en jaar
-            const dayOfWeek = now.toLocaleString('en-US', { weekday: 'long' });
-            const month = now.toLocaleString('en-US', { month: 'long' });
-            const day = String(now.getDate()).padStart(2, '0');
-            const year = now.getFullYear();
-
-            // Format de datum en tijd zonder tijdzone
-            const formattedTime = `${dayOfWeek}, ${month} ${day}, ${year} ${hours}:${minutes}:${seconds}`;
+            const options = { timeZone: userTimezone, hour12: false };
+            const formattedTime = now.toLocaleString('en-US', {
+                ...options,
+                weekday: 'long',
+                month: 'long',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            });
 
             // Static system message for the AI with the current date and time
             const messages = [
