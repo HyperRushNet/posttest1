@@ -37,9 +37,8 @@ export default async function handler(req, res) {
             // Extract timezone from ipapi response
             const timezone = timezoneData.timezone;
 
-            // Extract date and time information (assuming datetime is provided in ipapi response)
-            const currentDateTime = timezoneData.datetime; // If ipapi doesn't provide datetime, you may need another source
-            const now = new Date(currentDateTime);
+            // Get the current date and time using JavaScript's Date object (Browser time)
+            const now = new Date();
 
             // Format the datetime to include the full date and time
             const formattedTime = now.toLocaleString('en-US', {
