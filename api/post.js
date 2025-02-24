@@ -38,14 +38,19 @@ export default async function handler(req, res) {
 
             // Get current date and time (system time)
             const now = new Date();
+
+            // Verkrijg het uur, minuten en seconden van de lokale servertijd
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            // Verkrijg de dag van de week, maand, dag en jaar
             const dayOfWeek = now.toLocaleString('en-US', { weekday: 'long' });
             const month = now.toLocaleString('en-US', { month: 'long' });
             const day = String(now.getDate()).padStart(2, '0');
             const year = now.getFullYear();
 
+            // Format de datum en tijd
             const formattedTime = `${dayOfWeek}, ${month} ${day}, ${year} ${hours}:${minutes}:${seconds}`;
 
             // Static system message for the AI with the current date and time
