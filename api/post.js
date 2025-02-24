@@ -4,13 +4,6 @@ function filterMessage(message) {
     return message;
 }
 
-// Functie om de tijdzone op basis van het IP-adres op te halen
-async function getTimeZone() {
-    const res = await fetch('https://ipapi.co/json');
-    const data = await res.json();
-    return data.timezone; // Return the timezone from the IPAPI response
-}
-
 export default async function handler(req, res) {
     // CORS settings
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -43,10 +36,7 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Get the user's time zone based on their IP address
-            const timezone = await getTimeZone();
-
-            // Get current date and time in the user's time zone
+            // Get current date and time (system time)
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -62,7 +52,7 @@ export default async function handler(req, res) {
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time in ${timezone}: ${formattedTime}`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time: ${formattedTime}`
                 },
                 { 
                     "role": "user", 
