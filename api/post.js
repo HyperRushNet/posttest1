@@ -50,7 +50,7 @@ export default async function handler(req, res) {
             const day = String(now.getDate()).padStart(2, '0');
             const year = now.getFullYear();
 
-            // Format de datum en tijd
+            // Format de datum en tijd zonder tijdzone
             const formattedTime = `${dayOfWeek}, ${month} ${day}, ${year} ${hours}:${minutes}:${seconds}`;
 
             // Static system message for the AI with the current date and time
