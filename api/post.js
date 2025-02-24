@@ -30,8 +30,8 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Force the timezone to always be Europe/Brussels
-            const timezone = "Europe/Brussels";
+            // Force the timezone to always be Europe/London (Groot-Brittannië)
+            const timezone = "Europe/London";
 
             // Get the current date and time using JavaScript's Date object (Browser time)
             const now = new Date();
