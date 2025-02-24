@@ -47,15 +47,17 @@ export default async function handler(req, res) {
             const timezone = await getTimeZone();
 
             // Get current date and time in the user's time zone
-            const currentDate = new Date();
-            const options = { timeZone: timezone, hour12: true };
-            const formattedDate = new Intl.DateTimeFormat('en-US', options).format(currentDate); 
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
 
             // Static system message for the AI with the current date and time
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time (your timezone - ${timezone}): ${formattedDate}`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current time in ${timezone}: ${formattedTime}`
                 },
                 { 
                     "role": "user", 
