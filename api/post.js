@@ -30,18 +30,17 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Fetch the user's IP location and timezone from ipapi.co
-            const ipResponse = await fetch('https://ipapi.co/json/');
-            const ipData = await ipResponse.json();
+            // Fetch current time for Europe/Brussels using TimeZoneDB API
+            const timezoneResponse = await fetch('http://worldtimeapi.org/api/timezone/Europe/Brussels');
+            const timezoneData = await timezoneResponse.json();
 
-            // Extract the timezone from the response
-            const userTimezone = ipData.timezone;
+            // Extract date and time information
+            const currentDateTime = timezoneData.datetime; // ISO 8601 format
+            const timezone = timezoneData.timezone;
 
-            // Get the current time based on the user's timezone
-            const now = new Date();
-            const options = { timeZone: userTimezone, hour12: false };
+            // Format the datetime to include the full date and time
+            const now = new Date(currentDateTime);
             const formattedTime = now.toLocaleString('en-US', {
-                ...options,
                 weekday: 'long',
                 month: 'long',
                 day: '2-digit',
@@ -49,13 +48,14 @@ export default async function handler(req, res) {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
+                hour12: false
             });
 
             // Static system message for the AI with the current date and time
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time: ${formattedTime}`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time: ${formattedTime} in timezone ${timezone}`
                 },
                 { 
                     "role": "user", 
