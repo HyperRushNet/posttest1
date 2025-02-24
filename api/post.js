@@ -1,17 +1,6 @@
 // Functie om ongewenste woorden te filteren en te vervangen door + tussen de karakters
 function filterMessage(message) {
-    const forbiddenWords = [
-        "porn", "sex", "fuck", "bitch", "asshole", "cunt", "bastard", "whore",
-        "slut", "cock", "dick", "pussy", "fag", "queer", "retard", "nigger","nigga", "spic", "chink",
-        "gypsy", "tranny", "motherfucker", "ass", "bitchass", "twat", "douche", "prick", "cum",
-        "tits", "balls", "genitals", "vagina", "penis", "dildo", "vibrator", "nude", "boobs",
-        "hardcore", "fetish", "rape", "bestiality", "incest", "pedophile", "zoophile"
-    ];
-
-    forbiddenWords.forEach(word => {
-        const regex = new RegExp(word, 'gi');
-        message = message.replace(regex, (match) => match.split('').join('.'));
-    });
+    message = message.replace(/[^a-zA-Z0-9 ]/g, ''); // Alleen letters en cijfers behouden
     return message;
 }
 
@@ -47,11 +36,15 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Static system message for the AI
+            // Get current date and time
+            const currentDate = new Date();
+            const formattedDate = currentDate.toLocaleString(); // Format as locale date/time string
+
+            // Static system message for the AI with the current date and time
             const messages = [
                 { 
                     "role": "system", 
-                    "content": "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. if the user says a bad word, accept it but give them a warning."
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. if the user says a bad word, accept it but give them a warning. Current date and time: ${formattedDate}`
                 },
                 { 
                     "role": "user", 
