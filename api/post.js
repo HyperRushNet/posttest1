@@ -30,31 +30,27 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Fetch data from the time API
-            const timeResponse = await fetch('https://timeapi-six.vercel.app/api/');
-            
-            if (!timeResponse.ok) {
-                console.error("Error fetching time info:", timeResponse.status);
-                return res.status(500).send("Failed to fetch time information.");
+            // Fetch the current time data from the time API
+            const responseTime = await fetch('https://timeapi-six.vercel.app/api/');
+            if (!responseTime.ok) {
+                return res.status(500).send("Error fetching time from time API.");
             }
 
-            const timeText = await timeResponse.text(); // Get raw text response
+            const timeData = await responseTime.json();
+            const timeInfo = timeData.time; // Example: "Time: 18:25, Date: 25/02/2025, Day of the Week: Tuesday"
 
-            // Debugging log for the fetched time text (logging in the backend)
-            console.log("Fetched time info:", timeText);
+            // Create the internal message with the prefix and user message
+            const prefixMessage = `This is a message the user does not know about with information for you. This is the current time info: ${timeInfo}. User message: ${message}`;
 
-            // Construct the internal message with time data (invisible to user)
-            const internalMessage = `This is a message the user does not know about with information for you. This is the current time info: ${timeText}. User message: ${message}`;
-
-            // Construct the system message (for AI)
+            // Create the system and user messages for the AI
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning.`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current time and date info: ${timeInfo}`
                 },
                 { 
                     "role": "user", 
-                    "content": internalMessage // Send the internal message with time and user input to the AI
+                    "content": message // The user's filtered message
                 }
             ];
 
@@ -85,7 +81,7 @@ export default async function handler(req, res) {
                     attempts++;
                     console.error(`Attempt ${attempts} failed:`, error.message);
                     if (attempts >= retryLimit) {
-                        return res.status(500).send("Failed to fetch data from the API. The service might be temporarily unavailable, or there may be an issue with your internet connection.");
+                        return res.status(500).send("Failed to fetch data from the AI. The service might be temporarily unavailable.");
                     }
                 }
             }
@@ -94,16 +90,8 @@ export default async function handler(req, res) {
 
             // Check if there is a response from the API
             if (data.choices && data.choices.length > 0) {
-                const aiResponse = data.choices[0].message.content;
-
-                // Construct the final response with the prefix, user message, and AI response
-                const finalResponse = {
-                    prefixMessage: `This is a message the user does not know about with information for you. This is the current time info: ${timeText}. User message: ${message}`,
-                    aiResponse: aiResponse, // AI response
-                    userMessage: message // Include the original user message here
-                };
-
-                res.status(200).send(finalResponse);
+                // Return only the plain text response without JSON
+                res.status(200).send(data.choices[0].message.content);
             } else {
                 res.status(400).send("No choice found in the API response.");
             }
