@@ -30,29 +30,15 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Force the timezone to always be Europe/London (Groot-Brittannië)
-            const timezone = "Europe/London";
+            // Fetch data from the time API (example: https://timeapi-six.vercel.app/api/)
+            const timeResponse = await fetch('https://timeapi-six.vercel.app/api/');
+            const timeText = await timeResponse.text(); // Get raw text response
 
-            // Get the current date and time using JavaScript's Date object (Browser time)
-            const now = new Date();
-
-            // Format the datetime to include the full date and time
-            const formattedTime = now.toLocaleString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-
-            // Static system message for the AI with the current date and time
+            // Construct the system message with time data
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current date and time: ${formattedTime} in timezone ${timezone}`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current time data: ${timeText}`
                 },
                 { 
                     "role": "user", 
