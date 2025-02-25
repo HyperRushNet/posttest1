@@ -30,9 +30,17 @@ export default async function handler(req, res) {
                 return res.status(400).send(`Your input is too long. Maximum allowed characters are ${MAX_USER_INPUT_CHARACTERS}.`);
             }
 
-            // Fetch data from the time API (example: https://timeapi-six.vercel.app/api/)
+            // Fetch data from the time API
             const timeResponse = await fetch('https://timeapi-six.vercel.app/api/');
+            if (!timeResponse.ok) {
+                console.error("Error fetching time info:", timeResponse.status);
+                return res.status(500).send("Failed to fetch time information.");
+            }
+
             const timeText = await timeResponse.text(); // Get raw text response
+
+            // Debugging log for the fetched time text
+            console.log("Fetched time info:", timeText);
 
             // Construct the internal message with time data (invisible to user)
             const internalMessage = `This is a message the user does not know about with information for you. This is the current time info: ${timeText}. User message: ${message}`;
