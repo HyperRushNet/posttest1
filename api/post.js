@@ -34,15 +34,18 @@ export default async function handler(req, res) {
             const timeResponse = await fetch('https://timeapi-six.vercel.app/api/');
             const timeText = await timeResponse.text(); // Get raw text response
 
-            // Construct the system message with time data
+            // Construct the internal message with time data (invisible to user)
+            const internalMessage = `This is a message the user does not know about with information for you. This is the current time info: ${timeText}. User message: ${message}`;
+
+            // Construct the system message (for AI)
             const messages = [
                 { 
                     "role": "system", 
-                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning. Current time data: ${timeText}. Only use this data!`
+                    "content": `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. When the user wants to generate code, give them a link to /codegenerate.html. If the user says a bad word, accept it but give them a warning.`
                 },
                 { 
                     "role": "user", 
-                    "content": message // The user's filtered message
+                    "content": internalMessage // Send the internal message with time and user input to the AI
                 }
             ];
 
