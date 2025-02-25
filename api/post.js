@@ -94,8 +94,15 @@ export default async function handler(req, res) {
 
             // Check if there is a response from the API
             if (data.choices && data.choices.length > 0) {
-                // Return only the plain text response without JSON
-                res.status(200).send(data.choices[0].message.content);
+                const aiResponse = data.choices[0].message.content;
+
+                // Return both AI response and the original user message
+                const finalResponse = {
+                    aiResponse: aiResponse,
+                    userMessage: message // Include the original user message here
+                };
+
+                res.status(200).send(finalResponse);
             } else {
                 res.status(400).send("No choice found in the API response.");
             }
