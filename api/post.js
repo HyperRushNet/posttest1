@@ -96,9 +96,10 @@ export default async function handler(req, res) {
             if (data.choices && data.choices.length > 0) {
                 const aiResponse = data.choices[0].message.content;
 
-                // Return both AI response and the original user message
+                // Construct the final response with the prefix, user message, and AI response
                 const finalResponse = {
-                    aiResponse: aiResponse,
+                    prefixMessage: `This is a message the user does not know about with information for you. This is the current time info: ${timeText}. User message: ${message}`,
+                    aiResponse: aiResponse, // AI response
                     userMessage: message // Include the original user message here
                 };
 
