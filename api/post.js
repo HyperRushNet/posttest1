@@ -32,6 +32,7 @@ export default async function handler(req, res) {
 
             // Fetch data from the time API
             const timeResponse = await fetch('https://timeapi-six.vercel.app/api/');
+            
             if (!timeResponse.ok) {
                 console.error("Error fetching time info:", timeResponse.status);
                 return res.status(500).send("Failed to fetch time information.");
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
 
             const timeText = await timeResponse.text(); // Get raw text response
 
-            // Debugging log for the fetched time text
+            // Debugging log for the fetched time text (logging in the backend)
             console.log("Fetched time info:", timeText);
 
             // Construct the internal message with time data (invisible to user)
