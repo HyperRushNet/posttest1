@@ -56,7 +56,7 @@ export default async function handler(req, res) {
             }, message);
 
             // System prompt for the AI
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you a list of emojis, those are there to make sure the request comes to you and doesn't get blocked. Please act like the emojies are pure text because the user does not know that. Still be strict and the user knows that you know what they said, even if it is racist or anything else.";
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you a list of emojis, those are there to make sure the request comes to you and doesn't get blocked. Please act like the emojies are pure text because the user does not know that. Still be strict and the user knows that you know what they said, even if it is racist or anything else. Do not allow those words.";
 
             // Create the messages for the AI
             const messages = [
