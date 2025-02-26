@@ -5,31 +5,30 @@ export default async function handler(req, res) {
         try {
             // Verkrijg het bericht uit het aanvraaglichaam
             const { message } = req.body;
-            
+
             // Controleer of een bericht is verzonden
             if (!message || message.length === 0) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Hier kun je de logica toevoegen om het bericht te verwerken, bijvoorbeeld filtering
-            // Voor nu sturen we de boodschap gewoon door naar de backend
-
-            const response = await fetch('https://aiendpost.vercel.app/apibackend', {
+            // Gebruik de fetch-aanroep die je hebt gegeven naar de backend
+            const response = await fetch('https://aiendpost.vercel.app/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
+                body: JSON.stringify({ message: message })
             });
 
-            // Controleer of de backend-API succesvol is
+            // Controleer of de fetch-aanroep succesvol is
             if (!response.ok) {
-                return res.status(500).send("Fout bij het aanroepen van de backend API.");
+                return res.status(500).send("Fout bij het aanroepen van de API.");
             }
 
-            // Verkrijg het antwoord van de backend
-            const backendResponse = await response.text();
+            // Verkrijg het antwoord van de API als tekst
+            const data = await response.text();
 
-            // Stuur de tekstuele response van de backend terug naar de client
-            res.status(200).send(backendResponse);
+            // Voeg de response van de API toe aan het chatgeschiedenis
+            // Je kunt dit eventueel naar de frontend sturen, zoals hieronder:
+            res.status(200).send(data);
 
         } catch (error) {
             console.error("Fout bij API-aanroep:", error);
