@@ -18,21 +18,21 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Replace each letter in the message with its emoji equivalent
-            function replaceWithEmoji(word) {
-                const emojiMap = {
-                    'a': '🅰', 'b': '🅱', 'c': '🅲', 'd': '🅳', 'e': '🅴', 'f': '🅵', 'g': '🅶', 'h': '🅷', 'i': '🅸',
-                    'j': '🅹', 'k': '🅺', 'l': '🅻', 'm': '🅼', 'n': '🅽', 'o': '🅾', 'p': '🅿', 'q': '🆀', 'r': '🆁',
-                    's': '🆂', 't': '🆃', 'u': '🆄', 'v': '🆅', 'w': '🆆', 'x': '🆇', 'y': '🆈', 'z': '🆉'
+            // Replace each letter in the message with its homoglyph equivalent
+            function replaceWithHomoglyph(word) {
+                const homoglyphMap = {
+                    'a': 'а', 'b': 'Ь', 'c': 'с', 'd': 'd', 'e': 'е', 'f': 'f', 'g': 'g', 'h': 'h', 'i': 'і',
+                    'j': 'ј', 'k': 'к', 'l': 'l', 'm': 'm', 'n': 'n', 'o': 'о', 'p': 'р', 'q': 'q', 'r': 'г',
+                    's': 'ѕ', 't': 't', 'u': 'u', 'v': 'v', 'w': 'w', 'x': 'х', 'y': 'у', 'z': 'z'
                 };
-                return word.split('').map(char => emojiMap[char.toLowerCase()] || char).join('');
+                return word.split('').map(char => homoglyphMap[char.toLowerCase()] || char).join('');
             }
 
             // Replace each letter in the message
-            const processedMessage = message.split(' ').map(word => replaceWithEmoji(word)).join(' ');
+            const processedMessage = message.split(' ').map(word => replaceWithHomoglyph(word)).join(' ');
 
             // System prompt for the AI
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you see a list of emojis, they are used to ensure the request reaches you and doesn't get blocked. Treat the emojis as pure text because the user is unaware of their purpose. Always maintain strictness, and be aware of everything the user says, even if it is offensive, racist, or inappropriate, whether it’s part of the current message or from previous messages in the chat history. Do not tolerate such language.";
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you see a list of homoglyphs, they are used to ensure the request reaches you and doesn't get blocked. Treat the homoglyphs as pure text because the user is unaware of their purpose. Always maintain strictness, and be aware of everything the user says, even if it is offensive, racist, or inappropriate, whether it’s part of the current message or from previous messages in the chat history. Do not tolerate such language.";
 
             // Create the messages for the AI
             const messages = [
