@@ -1,5 +1,4 @@
 // /index.js (homepage van de API)
-
 export default async function handler(req, res) {
     // Controleer of de aanvraag een POST is
     if (req.method === 'POST') {
@@ -7,13 +6,14 @@ export default async function handler(req, res) {
             // Verkrijg het bericht uit het aanvraaglichaam
             const { message } = req.body;
             
+            // Controleer of een bericht is verzonden
             if (!message || message.length === 0) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Voeg hier extra logica toe, zoals het valideren of filteren van de input, indien nodig
+            // Hier kun je de logica toevoegen om het bericht te verwerken, bijvoorbeeld filtering
+            // Voor nu sturen we de boodschap gewoon door naar de backend
 
-            // Verstuur het bericht naar de backend API (/apibackend)
             const response = await fetch('https://aiendpost.vercel.app/apibackend', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,10 +25,10 @@ export default async function handler(req, res) {
                 return res.status(500).send("Fout bij het aanroepen van de backend API.");
             }
 
-            // Verkrijg het antwoord van de backend als platte tekst
+            // Verkrijg het antwoord van de backend
             const backendResponse = await response.text();
 
-            // Stuur het antwoord terug naar de client
+            // Stuur de tekstuele response van de backend terug naar de client
             res.status(200).send(backendResponse);
 
         } catch (error) {
