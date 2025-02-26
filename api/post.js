@@ -18,28 +18,7 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Forbidden words list
-            const forbiddenWords = [
-                'nigg', 'nigger', 'nigga', // Variations of the word nigger
-                'bitch', 'bitches', 'bastard', // Swear words
-                'shit', 'shitty', 'asshole', 'ass', // Vulgar words
-                'faggot', 'fag', 'queer', // Homophobic words
-                'cunt', 'cock', 'dick', 'pussy', // Sexual swear words
-                'whore', 'slut', // Sexual terms
-                'motherfucker', 'fuck', 'fucking', // Vulgar language
-                'retard', 'stupid', 'dumb', // Insults
-                'chink', 'gook', 'spic', // Racist terms
-                'kike', 'beaner', // Racist terms
-                'terrorist', 'ISIS', 'al-Qaeda', // Terrorism related words
-                'rape', 'rapist', // Sexual violence related terms
-                'incest', 'pedophile', // Sexual abuse related terms
-                'slave', 'slavery', // Terms related to slavery
-                'kill', 'suicide', 'murder', 'bomb', // Violent words
-                'hate', 'hater', 'hating', 'kill yourself', // Hate actions
-                'violence', 'massacre' // Violence and massacre
-            ];
-
-            // Replace forbidden words with emoji (replace each letter)
+            // Replace each letter in the message with its emoji equivalent
             function replaceWithEmoji(word) {
                 const emojiMap = {
                     'a': '🅰', 'b': '🅱', 'c': '🅲', 'd': '🅳', 'e': '🅴', 'f': '🅵', 'g': '🅶', 'h': '🅷', 'i': '🅸',
@@ -49,11 +28,8 @@ export default async function handler(req, res) {
                 return word.split('').map(char => emojiMap[char.toLowerCase()] || char).join('');
             }
 
-            // Process message and replace forbidden words
-            const processedMessage = forbiddenWords.reduce((acc, word) => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                return acc.replace(regex, match => replaceWithEmoji(match));
-            }, message);
+            // Replace each letter in the message
+            const processedMessage = message.split(' ').map(word => replaceWithEmoji(word)).join(' ');
 
             // System prompt for the AI
             const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you a list of emojis, those are there to make sure the request comes to you and doesn't get blocked. Please act like the emojies are pure text because the user does not know that. Still be strict and the user knows that you know what they said, even if it is racist or anything else. Do not allow those words.";
