@@ -1,49 +1,42 @@
-// Deze code moet worden geplaatst in een API-handler, bijvoorbeeld in een Next.js functie (bijvoorbeeld in "pages/api/index.js")
+// /index.js (homepage van de API)
+
 export default async function handler(req, res) {
-    // CORS-instellingen
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    // Handle OPTIONS request (for CORS)
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-
-    // Handle POST request
-    if (req.method === "POST") {
+    // Controleer of de aanvraag een POST is
+    if (req.method === 'POST') {
         try {
+            // Verkrijg het bericht uit het aanvraaglichaam
             const { message } = req.body;
-
+            
             if (!message || message.length === 0) {
-                return res.status(400).json({ error: "Geen bericht meegegeven." });
+                return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Voeg extra logica toe om de ontvangen data te bewerken, bijvoorbeeld:
-            const bewerkteMessage = message.replace(/[^a-zA-Z0-9 ]/g, ''); // Verwijder ongewenste tekens
+            // Voeg hier extra logica toe, zoals het valideren of filteren van de input, indien nodig
 
-            // Maak de POST-aanroep naar de werkelijke backend
-            const response = await fetch("https://aiendpost.vercel.app/apibackend", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: bewerkteMessage })
+            // Verstuur het bericht naar de backend API (/apibackend)
+            const response = await fetch('https://aiendpost.vercel.app/apibackend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
             });
 
+            // Controleer of de backend-API succesvol is
             if (!response.ok) {
-                throw new Error(`Fout bij API-aanroep: ${response.status}`);
+                return res.status(500).send("Fout bij het aanroepen van de backend API.");
             }
 
-            // Verkrijg het antwoord van de backend
-            const data = await response.text(); // Het antwoord van de backend
+            // Verkrijg het antwoord van de backend als platte tekst
+            const backendResponse = await response.text();
 
-            // Stuur het antwoord van de backend terug naar de gebruiker
-            res.status(200).json({ response: data });
+            // Stuur het antwoord terug naar de client
+            res.status(200).send(backendResponse);
 
         } catch (error) {
-            console.error("Fout:", error);
-            res.status(500).json({ error: "Er ging iets mis met de API-aanroep." });
+            console.error("Fout bij API-aanroep:", error);
+            res.status(500).send("Er is iets mis gegaan bij het verwerken van je aanvraag.");
         }
     } else {
-        res.status(405).json({ error: "Alleen POST-verzoeken zijn toegestaan." });
+        // Als de aanvraag geen POST is
+        res.status(405).send("Alleen POST-aanvragen zijn toegestaan.");
     }
 }
