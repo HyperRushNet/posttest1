@@ -20,11 +20,7 @@ export default async function handler(req, res) {
 
             // List of inappropriate words to filter
             const inappropriateWords = [
-                'nigg', 'nigger', 'nigga', 'bitch', 'bitches', 'bastard', 'shit', 'shitty', 'asshole', 'ass', 
-                'faggot', 'fag', 'queer', 'cunt', 'cock', 'dick', 'pussy', 'whore', 'slut', 'motherfucker', 
-                'fuck', 'fucking', 'retard', 'stupid', 'dumb', 'chink', 'gook', 'spic', 'kike', 'beaner', 
-                'terrorist', 'ISIS', 'al-Qaeda', 'rape', 'rapist', 'incest', 'pedophile', 'slave', 'slavery', 
-                'kill', 'suicide', 'murder', 'bomb', 'hate', 'hater', 'hating', 'kill yourself', 'violence', 'massacre'
+                'hhhhhhhhhhhhhhh'
             ];
 
             // Function to replace inappropriate words with asterisks
