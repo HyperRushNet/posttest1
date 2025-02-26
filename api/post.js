@@ -1,14 +1,4 @@
 export default async function handler(req, res) {
-    // CORS instellingen
-    res.setHeader("Access-Control-Allow-Origin", "*");  // Hiermee wordt toegang vanaf alle domeinen toegestaan
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");  // Alleen POST en OPTIONS zijn toegestaan
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");  // Alleen Content-Type header is toegestaan
-
-    // Handle OPTIONS verzoeken (voor CORS)
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-
     if (req.method === 'POST') {
         try {
             // Verkrijg het bericht uit de request body
@@ -19,13 +9,33 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Limiet voor het aantal tekens
-            const MAX_MESSAGE_LENGTH = 100000;  // 100k tekens
+            // Lijst met geblokkeerde woorden
+            const forbiddenWords = [
+                'nigg', 'nigger', 'nigga', 'bitch', 'bitches', 'bastard', 'shit', 'shitty', 
+                'asshole', 'ass', 'faggot', 'fag', 'queer', 'cunt', 'cock', 'dick', 'pussy', 
+                'whore', 'slut', 'motherfucker', 'fuck', 'fucking', 'retard', 'stupid', 'dumb', 
+                'chink', 'gook', 'spic', 'kike', 'beaner', 'terrorist', 'ISIS', 'al-Qaeda', 
+                'rape', 'rapist', 'incest', 'pedophile', 'slave', 'slavery', 'kill', 'suicide', 
+                'murder', 'bomb', 'hate', 'hater', 'hating', 'kill yourself', 'violence', 'massacre'
+            ];
 
-            // Controleer of de lengte van het bericht te lang is
-            if (message.length > MAX_MESSAGE_LENGTH) {
-                return res.status(400).send(`Je bericht is te lang. Het maximale aantal tekens is ${MAX_MESSAGE_LENGTH}.`);
-            }
+            // Functie om geblokkeerde woorden te vervangen door emoji's
+            const replaceWithEmojis = (word) => {
+                const emojiMap = {
+                    'a': '🅰️', 'b': '🅱️', 'c': '🅲', 'd': '🅳', 'e': '🅴', 'f': '🅵', 'g': '🅶',
+                    'h': '🅷', 'i': '🅸', 'j': '🅹', 'k': '🅺', 'l': '🅻', 'm': '🅼', 'n': '🅽',
+                    'o': '🅾️', 'p': '🅿️', 'q': '🆀', 'r': '🆁', 's': '🆂', 't': '🆃', 'u': '🆄',
+                    'v': '🆅', 'w': '🆆', 'x': '🆇', 'y': '🆈', 'z': '🆉'
+                };
+                
+                return word.split('').map(letter => emojiMap[letter.toLowerCase()] || letter).join('');
+            };
+
+            // Vervang de geblokkeerde woorden
+            forbiddenWords.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                message = message.replace(regex, (match) => replaceWithEmojis(match));
+            });
 
             // System prompt voor de AI
             const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated.";
