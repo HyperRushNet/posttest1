@@ -18,31 +18,37 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Replace each letter in the message with its homoglyph equivalent
-            function replaceWithHomoglyph(word) {
-                const homoglyphMap = {
-                    'a': 'а', 'b': 'Ь', 'c': 'с', 'd': 'd', 'e': 'е', 'f': 'f', 'g': 'g', 'h': 'h', 'i': 'і',
-                    'j': 'ј', 'k': 'к', 'l': 'l', 'm': 'm', 'n': 'n', 'o': 'о', 'p': 'р', 'q': 'q', 'r': 'г',
-                    's': 'ѕ', 't': 't', 'u': 'u', 'v': 'v', 'w': 'w', 'x': 'х', 'y': 'у', 'z': 'z'
-                };
-                return word.split('').map(char => homoglyphMap[char.toLowerCase()] || char).join('');
+            // List of inappropriate words to filter
+            const inappropriateWords = [
+                'nigg', 'nigger', 'nigga', 'bitch', 'bitches', 'bastard', 'shit', 'shitty', 'asshole', 'ass', 
+                'faggot', 'fag', 'queer', 'cunt', 'cock', 'dick', 'pussy', 'whore', 'slut', 'motherfucker', 
+                'fuck', 'fucking', 'retard', 'stupid', 'dumb', 'chink', 'gook', 'spic', 'kike', 'beaner', 
+                'terrorist', 'ISIS', 'al-Qaeda', 'rape', 'rapist', 'incest', 'pedophile', 'slave', 'slavery', 
+                'kill', 'suicide', 'murder', 'bomb', 'hate', 'hater', 'hating', 'kill yourself', 'violence', 'massacre'
+            ];
+
+            // Function to replace inappropriate words with asterisks
+            function filterInappropriateWords(word) {
+                return inappropriateWords.some(inappropriateWord => word.toLowerCase().includes(inappropriateWord)) 
+                    ? '*'.repeat(word.length) 
+                    : word;
             }
 
-            // Replace each letter in the message
-            const processedMessage = message.split(' ').map(word => replaceWithHomoglyph(word)).join(' ');
+            // Process the entire message by replacing inappropriate words
+            const processedMessage = message.split(' ').map(word => filterInappropriateWords(word)).join(' ');
 
             // System prompt for the AI
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you see a list of homoglyphs, they are used to ensure the request reaches you and doesn't get blocked. Treat the homoglyphs as pure text because the user is unaware of their purpose. Always maintain strictness, and be aware of everything the user says, even if it is offensive, racist, or inappropriate, whether it’s part of the current message or from previous messages in the chat history. Do not tolerate such language.";
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you see a list of inappropriate words, they are used to ensure the request reaches you and doesn't get blocked. Treat the inappropriate words as pure text because the user is unaware of their purpose. Always maintain strictness, and be aware of everything the user says, even if it is offensive, racist, or inappropriate, whether it’s part of the current message or from previous messages in the chat history. Do not tolerate such language.";
 
-            // Create the messages for the AI
+            // Create the messages for the AI with the user message first
             const messages = [
-                { 
-                    "role": "system", 
-                    "content": systemPrompt
-                },
                 { 
                     "role": "user", 
                     "content": processedMessage
+                },
+                { 
+                    "role": "system", 
+                    "content": systemPrompt
                 }
             ];
 
