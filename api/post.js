@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+    // CORS instellingen
+    res.setHeader("Access-Control-Allow-Origin", "*");  // Hiermee wordt toegang vanaf alle domeinen toegestaan
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");  // Alleen POST en OPTIONS zijn toegestaan
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");  // Alleen Content-Type header is toegestaan
+
+    // Handle OPTIONS verzoeken (voor CORS)
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+
     if (req.method === 'POST') {
         try {
             // Verkrijg het bericht uit de request body
