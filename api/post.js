@@ -19,6 +19,14 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
+            // Limiet voor het aantal tekens
+            const MAX_MESSAGE_LENGTH = 100000;  // 100k tekens
+
+            // Controleer of de lengte van het bericht te lang is
+            if (message.length > MAX_MESSAGE_LENGTH) {
+                return res.status(400).send(`Je bericht is te lang. Het maximale aantal tekens is ${MAX_MESSAGE_LENGTH}.`);
+            }
+
             // System prompt voor de AI
             const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated.";
 
