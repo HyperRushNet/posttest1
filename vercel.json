@@ -1,8 +1,7 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/apibackend", "dest": "/api/post.js" }
+    { "src": "/apibackend", "dest": "/api/post.js" },
     { "src": "/", "dest": "/api/apifront.js" }
-
   ]
 }
