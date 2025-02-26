@@ -1,47 +1,108 @@
 export default async function handler(req, res) {
+    // CORS settings (disabled)
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    // Handle OPTIONS request (for CORS)
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+
     if (req.method === 'POST') {
         try {
+            // Get the message from the request body
             const { message } = req.body;
 
-            // Check if message exists
             if (!message || message.length === 0) {
-                console.error("Geen bericht ontvangen.");
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated.";
-
-            // Setup messages for OpenAI
-            const messages = [
-                { "role": "system", "content": systemPrompt },
-                { "role": "user", "content": message }
+            // Forbidden words list
+            const forbiddenWords = [
+                'nigg', 'nigger', 'nigga', // Variations of the word nigger
+                'bitch', 'bitches', 'bastard', // Swear words
+                'shit', 'shitty', 'asshole', 'ass', // Vulgar words
+                'faggot', 'fag', 'queer', // Homophobic words
+                'cunt', 'cock', 'dick', 'pussy', // Sexual swear words
+                'whore', 'slut', // Sexual terms
+                'motherfucker', 'fuck', 'fucking', // Vulgar language
+                'retard', 'stupid', 'dumb', // Insults
+                'chink', 'gook', 'spic', // Racist terms
+                'kike', 'beaner', // Racist terms
+                'terrorist', 'ISIS', 'al-Qaeda', // Terrorism related words
+                'rape', 'rapist', // Sexual violence related terms
+                'incest', 'pedophile', // Sexual abuse related terms
+                'slave', 'slavery', // Terms related to slavery
+                'kill', 'suicide', 'murder', 'bomb', // Violent words
+                'hate', 'hater', 'hating', 'kill yourself', // Hate actions
+                'violence', 'massacre' // Violence and massacre
             ];
 
+            // Replace forbidden words with emoji (replace each letter)
+            function replaceWithEmoji(word) {
+                const emojiMap = {
+                    'a': '🅰️', 'b': '🅱️', 'c': '🌜', 'd': '🌛', 'e': '📧', 'f': '🎏', 'g': '🌀', 'h': '♓', 'i': 'ℹ️',
+                    'j': '🎷', 'k': '🎋', 'l': '👢', 'm': 'Ⓜ️', 'n': '🅽', 'o': '🅾️', 'p': '🅿️', 'q': '🍳', 'r': '🌱',
+                    's': '💲', 't': '🌴', 'u': '⛎', 'v': '✅', 'w': '🔱', 'x': '❌', 'y': '🍋', 'z': 'Ⓩ'
+                };
+                return word.split('').map(char => emojiMap[char.toLowerCase()] || char).join('');
+            }
+
+            // Process message and replace forbidden words
+            const processedMessage = forbiddenWords.reduce((acc, word) => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                return acc.replace(regex, match => replaceWithEmoji(match));
+            }, message);
+
+            // System prompt for the AI
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated.";
+
+            // Create the messages for the AI
+            const messages = [
+                { 
+                    "role": "system", 
+                    "content": systemPrompt
+                },
+                { 
+                    "role": "user", 
+                    "content": processedMessage
+                }
+            ];
+
+            // Send the message to OpenAI via text.pollinations.ai/openai
             const response = await fetch('https://text.pollinations.ai/openai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: messages, max_tokens: 100 })
+                body: JSON.stringify({
+                    messages: messages, // Add system and user message
+                    max_tokens: 100 // Max number of tokens
+                })
             });
 
+            // Check if the response is successful
             if (!response.ok) {
-                console.error(`Fout bij API-aanroep: ${response.status} - ${response.statusText}`);
                 return res.status(500).send("Fout bij het aanroepen van de AI API.");
             }
 
+            // Get the JSON data from the response
             const data = await response.json();
 
+            // Check if the choice (AI response) is present in the data
             if (data.choices && data.choices.length > 0) {
                 const aiMessage = data.choices[0].message.content;
-                return res.status(200).send(aiMessage);
+                
+                // Send the AI response back to the client
+                res.status(200).send(aiMessage);
             } else {
-                console.error("Geen antwoord gevonden in de API response.");
-                return res.status(400).send("Geen antwoord gevonden in de AI response.");
+                res.status(400).send("Geen antwoord gevonden in de AI response.");
             }
         } catch (error) {
             console.error("Fout bij API-aanroep:", error);
             res.status(500).send("Er is iets mis gegaan bij het verwerken van je aanvraag.");
         }
     } else {
+        // If the request is not POST, send an error message
         res.status(405).send("Alleen POST-aanvragen zijn toegestaan.");
     }
 }
