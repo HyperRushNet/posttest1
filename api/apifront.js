@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         }
 
         // Stuur de vraag naar /apibackend
-        const response = await fetch("https://example.com/apibackend", { // Vervang door de echte URL
+        const response = await fetch("/apibackend", { // Vervang door de echte URL
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ vraag })
