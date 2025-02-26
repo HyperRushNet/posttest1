@@ -1,41 +1,62 @@
-// /index.js (homepage van de API)
 export default async function handler(req, res) {
-    // Controleer of de aanvraag een POST is
     if (req.method === 'POST') {
         try {
-            // Verkrijg het bericht uit het aanvraaglichaam
+            // Verkrijg het bericht uit de request body
             const { message } = req.body;
 
-            // Controleer of een bericht is verzonden
+            // Controleer of het bericht bestaat
             if (!message || message.length === 0) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Gebruik de fetch-aanroep die je hebt gegeven naar de backend
-            const response = await fetch('https://aiendpost.vercel.app/', {
+            // System prompt voor de AI
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated.";
+
+            // Maak de berichten voor de AI
+            const messages = [
+                { 
+                    "role": "system", 
+                    "content": systemPrompt
+                },
+                { 
+                    "role": "user", 
+                    "content": message
+                }
+            ];
+
+            // Verstuur het bericht naar de OpenAI API via text.pollinations.ai/openai
+            const response = await fetch('https://text.pollinations.ai/openai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({
+                    messages: messages, // Voeg system en gebruikersbericht toe
+                    max_tokens: 100 // Maximaal aantal tokens
+                })
             });
 
-            // Controleer of de fetch-aanroep succesvol is
+            // Controleer of de response succesvol was
             if (!response.ok) {
-                return res.status(500).send("Fout bij het aanroepen van de API.");
+                return res.status(500).send("Fout bij het aanroepen van de AI API.");
             }
 
-            // Verkrijg het antwoord van de API als tekst
-            const data = await response.text();
+            // Verkrijg de JSON data van de response
+            const data = await response.json();
 
-            // Voeg de response van de API toe aan het chatgeschiedenis
-            // Je kunt dit eventueel naar de frontend sturen, zoals hieronder:
-            res.status(200).send(data);
-
+            // Controleer of de keuze (AI response) aanwezig is in de data
+            if (data.choices && data.choices.length > 0) {
+                const aiMessage = data.choices[0].message.content;
+                
+                // Stuur de AI respons terug naar de client
+                res.status(200).send(aiMessage);
+            } else {
+                res.status(400).send("Geen antwoord gevonden in de AI response.");
+            }
         } catch (error) {
             console.error("Fout bij API-aanroep:", error);
             res.status(500).send("Er is iets mis gegaan bij het verwerken van je aanvraag.");
         }
     } else {
-        // Als de aanvraag geen POST is
+        // Als de aanvraag geen POST is, stuur dan een foutmelding
         res.status(405).send("Alleen POST-aanvragen zijn toegestaan.");
     }
 }
