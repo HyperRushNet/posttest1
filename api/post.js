@@ -43,36 +43,7 @@ export default async function handler(req, res) {
             const transformedMessage = message.split(' ').map(word => transformText(word)).join(' ');
 
             // Cheatsheet voor de AI (toegevoegd aan de prompt)
-            const cheatsheet = `
-            Cheatsheet voor de AI:
-            a -> z
-            b -> y
-            c -> x
-            d -> w
-            e -> v
-            f -> u
-            g -> t
-            h -> s
-            i -> r
-            j -> q
-            k -> p
-            l -> o
-            m -> n
-            n -> m
-            o -> l
-            p -> k
-            q -> j
-            r -> i
-            s -> h
-            t -> g
-            u -> f
-            v -> e
-            w -> d
-            x -> c
-            y -> b
-            z -> a`;
-
-            // Systeemprompt voor de AI met de cheatsheet toegevoegd
+  
             const systemPrompt = `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning when said. The user is going to give a string of random letters, you need to decode it and answer. The user does not know the message is being encoded so do not say that or show any signs of decoding. Here is your cheatsheet for decoding: a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a`;
 
             // Maak de berichten voor de AI (gebruikersbericht eerst)
