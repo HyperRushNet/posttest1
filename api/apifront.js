@@ -18,44 +18,20 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Functie om letters te vervormen (decoderen van z -> a, y -> b, enz.)
-            const letterMapping = {
-                'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v', 'f': 'u', 'g': 't', 'h': 's',
-                'i': 'r', 'j': 'q', 'k': 'p', 'l': 'o', 'm': 'n', 'n': 'm', 'o': 'l', 'p': 'k',
-                'q': 'j', 'r': 'i', 's': 'h', 't': 'g', 'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c',
-                'y': 'b', 'z': 'a'
-            };
+            // Encodeer het bericht in Base64
+            const encodedMessage = Buffer.from(message).toString('base64');
 
-            // Functie om de tekst te vervormen, hoofdletters blijven hoofdletters
-            function transformText(str) {
-                return str.split('').map(char => {
-                    if (char.toLowerCase() in letterMapping) {
-                        // Als het een letter is, vervang deze
-                        const mappedChar = letterMapping[char.toLowerCase()];
-                        return char === char.toUpperCase() ? mappedChar.toUpperCase() : mappedChar;
-                    }
-                    // Als het geen letter is, laat het ongewijzigd
-                    return char;
-                }).join('');
-            }
-
-            // Vervorm de gehele boodschap
-            const transformedMessage = message.split(' ').map(word => transformText(word)).join(' ');
-
-            // Systeemprompt voor de AI met de cheatsheet toegevoegd
+            // Systeem prompt voor de AI met de aanwijzing om Base64 te decoderen
             const systemPrompt = `
             You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.
 
-            You will only receive encoded messages. You should use the following letter transformation cheatsheet to decode any text you receive. Apply the transformations to every letter in the text:
-            a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a
+            You will only receive messages encoded in Base64. Decode the following Base64-encoded message.`;
 
-            Example: If you receive the word "svool", you should transform it to "hello".`;
-
-            // Maak de berichten voor de AI (gebruikersbericht eerst)
+            // Maak het bericht voor de AI
             const messages = [
                 { 
                     "role": "user", 
-                    "content": transformedMessage
+                    "content": encodedMessage
                 },
                 { 
                     "role": "system", 
@@ -75,8 +51,6 @@ export default async function handler(req, res) {
 
             // Controleer of de respons succesvol is
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Fout bij API-aanroep:", errorText);
                 return res.status(500).send("Fout bij het aanroepen van de AI API.");
             }
 
