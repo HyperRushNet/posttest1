@@ -75,6 +75,8 @@ export default async function handler(req, res) {
 
             // Controleer of de respons succesvol is
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Fout bij API-aanroep:", errorText);
                 return res.status(500).send("Fout bij het aanroepen van de AI API.");
             }
 
