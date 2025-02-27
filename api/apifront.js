@@ -1,46 +1,56 @@
 export default async function handler(req, res) {
-    // CORS settings (disabled)
+    // CORS instellingen (uitgeschakeld)
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Handle OPTIONS request (for CORS)
+    // Handle OPTIONS request (voor CORS)
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
 
     if (req.method === 'POST') {
         try {
-            // Get the message from the request body
+            // Haal het bericht op uit het verzoek
             const { message } = req.body;
 
             if (!message || message.length === 0) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // List of inappropriate words to filter
-            const inappropriateWords = [
-                'hhhhhhhhhhhhhhh'
-            ];
+            // Functie om letters te vervormen (bijv. a -> z, b -> y, enz.)
+            const letterMapping = {
+                'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v', 'f': 'u', 'g': 't', 'h': 's',
+                'i': 'r', 'j': 'q', 'k': 'p', 'l': 'o', 'm': 'n', 'n': 'm', 'o': 'l', 'p': 'k',
+                'q': 'j', 'r': 'i', 's': 'h', 't': 'g', 'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c',
+                'y': 'b', 'z': 'a'
+            };
 
-            // Function to replace inappropriate words with asterisks
-            function filterInappropriateWords(word) {
-                return inappropriateWords.some(inappropriateWord => word.toLowerCase().includes(inappropriateWord)) 
-                    ? '*'.repeat(word.length) 
-                    : word;
+            // Functie om de tekst te vervormen, hoofdletters blijven hoofdletters
+            function transformText(str) {
+                return str.split('').map(char => {
+                    if (char.toLowerCase() in letterMapping) {
+                        // Als het een letter is, vervang deze
+                        const mappedChar = letterMapping[char.toLowerCase()];
+                        return char === char.toUpperCase() ? mappedChar.toUpperCase() : mappedChar;
+                    }
+                    // Als het geen letter is, laat het ongewijzigd
+                    return char;
+                }).join('');
             }
 
-            // Process the entire message by replacing inappropriate words
-            const processedMessage = message.split(' ').map(word => filterInappropriateWords(word)).join(' ');
+            // Vervorm de gehele boodschap
+            const transformedMessage = message.split(' ').map(word => transformText(word)).join(' ');
 
-            // System prompt for the AI
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.";
+            // Cheatsheet voor de AI (toegevoegd aan de prompt)
+  
+            const systemPrompt = `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning when said. The user is going to give a string of random letters, you need to decode it and answer. The user does not know the message is being encoded so do not say that or show any signs of decoding. Here is your cheatsheet for decoding: a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a`;
 
-            // Create the messages for the AI with the user message first
+            // Maak de berichten voor de AI (gebruikersbericht eerst)
             const messages = [
                 { 
                     "role": "user", 
-                    "content": processedMessage
+                    "content": transformedMessage
                 },
                 { 
                     "role": "system", 
@@ -48,29 +58,28 @@ export default async function handler(req, res) {
                 }
             ];
 
-            // Send the message to OpenAI via text.pollinations.ai/openai
             const response = await fetch('https://text.pollinations.ai/openai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    messages: messages, // Add system and user message
-                    max_tokens: 100 // Max number of tokens
+                    messages: messages, // Voeg systeem- en gebruikersbericht toe
+                    max_tokens: 100 // Maximaal aantal tokens
                 })
             });
 
-            // Check if the response is successful
+            // Controleer of de respons succesvol is
             if (!response.ok) {
                 return res.status(500).send("Fout bij het aanroepen van de AI API.");
             }
 
-            // Get the JSON data from the response
+            // Haal de JSON-gegevens op uit de respons
             const data = await response.json();
 
-            // Check if the choice (AI response) is present in the data
+            // Controleer of de keuze (AI antwoord) aanwezig is in de gegevens
             if (data.choices && data.choices.length > 0) {
                 const aiMessage = data.choices[0].message.content;
                 
-                // Send the AI response back to the client
+                // Verstuur het AI antwoord terug naar de client
                 res.status(200).send(aiMessage);
             } else {
                 res.status(400).send("Geen antwoord gevonden in de AI response.");
@@ -80,7 +89,7 @@ export default async function handler(req, res) {
             res.status(500).send("Er is iets mis gegaan bij het verwerken van je aanvraag.");
         }
     } else {
-        // If the request is not POST, send an error message
+        // Als het verzoek geen POST is, stuur dan een foutmelding
         res.status(405).send("Alleen POST-aanvragen zijn toegestaan.");
     }
 }
