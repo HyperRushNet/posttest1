@@ -34,7 +34,7 @@ export default async function handler(req, res) {
             const processedMessage = message.split(' ').map(word => filterInappropriateWords(word)).join(' ');
 
             // System prompt for the AI
-            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. If you see a list of inappropriate words, they are used to ensure the request reaches you and doesn't get blocked. Treat the inappropriate words as pure text because the user is unaware of their purpose. Always maintain strictness, and be aware of everything the user says, even if it is offensive, racist, or inappropriate, whether it’s part of the current message or from previous messages in the chat history. Do not tolerate such language.";
+            const systemPrompt = "You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.";
 
             // Create the messages for the AI with the user message first
             const messages = [
