@@ -43,11 +43,14 @@ export default async function handler(req, res) {
             const transformedMessage = message.split(' ').map(word => transformText(word)).join(' ');
 
             // Cheatsheet voor de AI (toegevoegd aan de prompt)
-  
-          const systemPrompt = `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.
+            const cheatsheet = `
+            a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a`;
 
-Here is the letter transformation cheatsheet that you should be aware of. always decode the message of the user:
-a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a`;
+            // Systeemprompt voor de AI met de cheatsheet toegevoegd
+            const systemPrompt = `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.
+
+            Here is the letter transformation cheatsheet that you should be aware of:
+            ${cheatsheet}`;
 
             // Maak de berichten voor de AI (gebruikersbericht eerst)
             const messages = [
@@ -61,6 +64,7 @@ a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, 
                 }
             ];
 
+            // Verstuur het bericht naar OpenAI via text.pollinations.ai/openai
             const response = await fetch('https://text.pollinations.ai/openai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
