@@ -18,39 +18,17 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Functie om letters te vervormen (bijv. a -> z, b -> y, enz.)
-            const letterMapping = {
-                'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v', 'f': 'u', 'g': 't', 'h': 's',
-                'i': 'r', 'j': 'q', 'k': 'p', 'l': 'o', 'm': 'n', 'n': 'm', 'o': 'l', 'p': 'k',
-                'q': 'j', 'r': 'i', 's': 'h', 't': 'g', 'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c',
-                'y': 'b', 'z': 'a'
-            };
+            // Systeem prompt voor de AI
+            const systemPrompt = `
+You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.
 
-            // Functie om de tekst te vervormen, hoofdletters blijven hoofdletters
-            function transformText(str) {
-                return str.split('').map(char => {
-                    if (char.toLowerCase() in letterMapping) {
-                        // Als het een letter is, vervang deze
-                        const mappedChar = letterMapping[char.toLowerCase()];
-                        return char === char.toUpperCase() ? mappedChar.toUpperCase() : mappedChar;
-                    }
-                    // Als het geen letter is, laat het ongewijzigd
-                    return char;
-                }).join('');
-            }
+Please respond in a helpful and friendly manner. If the message seems unclear or incomplete, politely ask the user for clarification. Use the context provided in the message history to form a better response.`;
 
-            // Vervorm de gehele boodschap
-            const transformedMessage = message.split(' ').map(word => transformText(word)).join(' ');
-
-            // Cheatsheet voor de AI (toegevoegd aan de prompt)
-  
-            const systemPrompt = `You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning when said. The user is going to give a string of random letters, you need to decode it and answer. The user does not know the message is being encoded so do not say that or show any signs of decoding. Here is your cheatsheet for decoding: a -> z, b -> y, c -> x, d -> w, e -> v, f -> u, g -> t, h -> s, i -> r, j -> q, k -> p, l -> o, m -> n, n -> m, o -> l, p -> k, q -> j, r -> i, s -> h, t -> g, u -> f, v -> e, w -> d, x -> c, y -> b, z -> a`;
-
-            // Maak de berichten voor de AI (gebruikersbericht eerst)
+            // Maak het bericht voor de AI
             const messages = [
                 { 
                     "role": "user", 
-                    "content": transformedMessage
+                    "content": message
                 },
                 { 
                     "role": "system", 
@@ -58,6 +36,7 @@ export default async function handler(req, res) {
                 }
             ];
 
+            // Verstuur het bericht naar OpenAI via text.pollinations.ai/openai
             const response = await fetch('https://text.pollinations.ai/openai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
