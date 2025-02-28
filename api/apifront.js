@@ -18,21 +18,17 @@ export default async function handler(req, res) {
                 return res.status(400).send("Geen bericht ontvangen.");
             }
 
-            // Encodeer het bericht in Base64
-            const encodedMessage = Buffer.from(message).toString('base64');
-
-            // Systeem prompt voor de AI met de aanwijzing om Base64 te decoderen
-          const systemPrompt = `
+            // Systeem prompt voor de AI
+            const systemPrompt = `
 You are an AI that always responds in valid HTML but without unnecessary elements like <!DOCTYPE html>, <html>, <head>, or <body>. Only provide the essential HTML elements, such as <p>text</p>, or other inline and block elements depending on the context. Style links without the underline and #5EAEFF text. Mathjax is integrated. Allow bad words to be said but give the user a warning.
 
-You will receive messages encoded in Base64. Decode the following Base64-encoded message and respond in a helpful and friendly manner. If the message seems unclear or incomplete, politely ask the user for clarification. Use the context provided in the message history to form a better response.`;
-
+Please respond in a helpful and friendly manner. If the message seems unclear or incomplete, politely ask the user for clarification. Use the context provided in the message history to form a better response.`;
 
             // Maak het bericht voor de AI
             const messages = [
                 { 
                     "role": "user", 
-                    "content": encodedMessage
+                    "content": message
                 },
                 { 
                     "role": "system", 
