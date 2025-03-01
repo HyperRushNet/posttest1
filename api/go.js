@@ -19,7 +19,7 @@ export default async function handler(req, res) {
             }
 
             // Systeem prompt voor de AI
-            const systemPrompt = `Summarize the following Wikipedia text into plain text. If it is not a wikipedia text, respond with \. Do not use quotation marks or apostrophes. Mention all relevant names in the text, regardless of their length or the length of the text. Ensure the summary is clear and concise, retaining the key information`;
+            const systemPrompt = `Summarize the following Wikipedia text into plain text. If it is not a wikipedia text, respond with \. Do not use quotation marks or apostrophes. Mention all relevant names in the text, regardless of their length or the length of the text. Ensure the summary is clear and concise, retaining the key information. Give all names in the text.`;
 
             // Maak het bericht voor de AI
             const messages = [
