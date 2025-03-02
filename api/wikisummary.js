@@ -19,7 +19,7 @@ export default async function handler(req, res) {
             }
 
             // Systeem prompt voor de AI
-            const systemPrompt = `Summarize the following Wikipedia text into plain text. Do not use quotation marks or apostrophes. Include all relevant names, dates, events, and key details mentioned in the text, regardless of their length. Ensure the summary is clear, concise, and covers all important information.`;
+            const systemPrompt = `Summarize the following Wikipedia text into plain text. Do not use quotation marks or apostrophes. Make it optimal for a system prompt for AI, it is going to be used as up-to-date information for the AI LLM. Include all relevant names, dates, events, and key details mentioned in the text, regardless of their length. Ensure the summary is clear, concise, and covers all important information.`;
 
             // Maak het bericht voor de AI
             const messages = [
