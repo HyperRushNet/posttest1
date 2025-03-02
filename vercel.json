@@ -2,6 +2,7 @@
   "version": 2,
   "routes": [
     { "src": "/apibackend", "dest": "/api/post.js" },
+    { "src": "/wikidata", "dest": "/api/wikisummary.js" },
     { "src": "/", "dest": "/api/apifront.js" }
   ]
 }
