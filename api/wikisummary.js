@@ -11,11 +11,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
         try {
-            // Haal het bericht op uit het verzoek
-            const { message } = req.body;
+            // Haal de volledige body op (nu kan het elk type inhoud zijn)
+            const requestBody = req.body;
 
-            if (!message || message.length === 0) {
-                return res.status(400).send("Geen bericht ontvangen.");
+            if (!requestBody || Object.keys(requestBody).length === 0) {
+                return res.status(400).send("Geen gegevens ontvangen.");
             }
 
             // Systeem prompt voor de AI
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             const messages = [
                 { 
                     "role": "user", 
-                    "content": message
+                    "content": JSON.stringify(requestBody)  // Gebruik de hele body als content
                 },
                 { 
                     "role": "system", 
