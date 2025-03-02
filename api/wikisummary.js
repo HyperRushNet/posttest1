@@ -19,7 +19,7 @@ export default async function handler(req, res) {
             }
 
             // Systeem prompt voor de AI
-            const systemPrompt = `Take all information out of the text you got and list it up in a short JSON response. Do not say it is in JSON.`;
+            const systemPrompt = `Extract all information from the received text and format it into a short JSON structure. Return only the JSON without any extra text or explanation.`;
 
             // Maak het bericht voor de AI
             const messages = [
